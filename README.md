@@ -1,0 +1,2 @@
+# gitka
+All things Git
