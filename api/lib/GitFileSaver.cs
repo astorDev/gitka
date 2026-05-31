@@ -23,8 +23,12 @@ public static class GitFileSaver
             }
 
             var fullPath = Path.Combine(cloneDir, filepath.Replace('/', Path.DirectorySeparatorChar));
-            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-            await File.WriteAllTextAsync(fullPath, content, ct);
+            var resolvedPath = Path.GetFullPath(fullPath);
+            var resolvedCloneDir = Path.GetFullPath(cloneDir) + Path.DirectorySeparatorChar;
+            if (!resolvedPath.StartsWith(resolvedCloneDir, StringComparison.Ordinal))
+                throw new ArgumentException("filepath attempts to escape the repository directory.", nameof(filepath));
+            Directory.CreateDirectory(Path.GetDirectoryName(resolvedPath)!);
+            await File.WriteAllTextAsync(resolvedPath, content, ct);
 
             await Run("add", filepath);
             await Run("commit", "-m", $"gitka: update {filepath}");
