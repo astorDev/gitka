@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="api/host/Gitka.Api.Host.csproj" />
+  <Project Path="api/lib/Gitka.Api.csproj"/>
+</Solution>

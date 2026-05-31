@@ -1,0 +1,4 @@
+.env
+*buffer.*
+bin/
+obj/
