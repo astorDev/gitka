@@ -18,9 +18,6 @@ public static class CliWrapHelpers
 
     public static Command WithExtraEnvironmentVariables(this Command command, Action<CliWrap.Builders.EnvironmentVariablesBuilder> configure)
     {
-        var builder = new CliWrap.Builders.EnvironmentVariablesBuilder();
-        builder.SetExistingOf(command);
-        configure(builder);
         return command.WithEnvironmentVariables(builder =>
         {
             builder.SetExistingOf(command);
