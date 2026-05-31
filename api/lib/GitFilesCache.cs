@@ -19,6 +19,8 @@ public static class GitFilesCache
 
     public static async Task<string> GetFileFromCache(this GitClient client, string branch, string filepath, CancellationToken ct = default)
     {
+        GitPathGuard.Validate(branch, nameof(branch));
+        GitPathGuard.Validate(filepath, nameof(filepath));
         return await Git(client, ["show", $"origin/{branch}:{filepath}"], ct);
     }
 }

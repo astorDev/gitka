@@ -22,9 +22,9 @@ public static class GitFileSaver
                 await Run("checkout", "-b", branch);
             }
 
-            var fullPath = Path.Combine(cloneDir, filepath.Replace('/', Path.DirectorySeparatorChar));
-            Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
-            await File.WriteAllTextAsync(fullPath, content, ct);
+            var resolvedPath = GitPathGuard.ValidateWithinBase(filepath, cloneDir);
+            Directory.CreateDirectory(Path.GetDirectoryName(resolvedPath)!);
+            await File.WriteAllTextAsync(resolvedPath, content, ct);
 
             await Run("add", filepath);
             await Run("commit", "-m", $"gitka: update {filepath}");
