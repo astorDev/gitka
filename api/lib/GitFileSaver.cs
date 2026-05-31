@@ -8,19 +8,19 @@ public static class GitFileSaver
 
         Task<string> Run(params string[] args) => client.Run(cloneDir, args, ct);
 
+        var lsRemote = await client.Run(Path.GetTempPath(), ["ls-remote", "--heads", repositoryUrl.ToString(), branch], ct);
+        var branchExists = lsRemote.Trim().Length > 0;
+
         Directory.CreateDirectory(cloneDir);
         try
         {
-            await Run("clone", repositoryUrl.ToString(), ".");
-            var remoteBranchesRaw = await Run("branch", "-r");
-            var remoteBranches = remoteBranchesRaw.Split('\n').Select(b => b.Trim());
-
-            var branchExists = remoteBranches.Any(b => b == $"origin/{branch}");
-
             if (branchExists)
-                await Run("checkout", "-B", branch, $"origin/{branch}");
+                await Run("clone", "--depth", "1", "--single-branch", "--branch", branch, repositoryUrl.ToString(), ".");
             else
+            {
+                await Run("clone", "--depth", "1", repositoryUrl.ToString(), ".");
                 await Run("checkout", "-b", branch);
+            }
 
             var fullPath = Path.Combine(cloneDir, filepath.Replace('/', Path.DirectorySeparatorChar));
             Directory.CreateDirectory(Path.GetDirectoryName(fullPath)!);
