@@ -22,11 +22,7 @@ public static class GitFileSaver
                 await Run("checkout", "-b", branch);
             }
 
-            var fullPath = Path.Combine(cloneDir, filepath.Replace('/', Path.DirectorySeparatorChar));
-            var resolvedPath = Path.GetFullPath(fullPath);
-            var resolvedCloneDir = Path.GetFullPath(cloneDir) + Path.DirectorySeparatorChar;
-            if (!resolvedPath.StartsWith(resolvedCloneDir, StringComparison.Ordinal))
-                throw new ArgumentException("filepath attempts to escape the repository directory.", nameof(filepath));
+            var resolvedPath = GitPathGuard.ValidateWithinBase(filepath, cloneDir);
             Directory.CreateDirectory(Path.GetDirectoryName(resolvedPath)!);
             await File.WriteAllTextAsync(resolvedPath, content, ct);
 

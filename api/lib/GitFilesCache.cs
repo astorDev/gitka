@@ -19,10 +19,8 @@ public static class GitFilesCache
 
     public static async Task<string> GetFileFromCache(this GitClient client, string branch, string filepath, CancellationToken ct = default)
     {
-        if (branch.Split('/').Any(s => s == ".."))
-            throw new ArgumentException("branch contains invalid path traversal segments.", nameof(branch));
-        if (filepath.Split('/').Any(s => s == "..") || Path.IsPathRooted(filepath))
-            throw new ArgumentException("filepath contains invalid path traversal segments or is an absolute path.", nameof(filepath));
+        GitPathGuard.Validate(branch, nameof(branch));
+        GitPathGuard.Validate(filepath, nameof(filepath));
         return await Git(client, ["show", $"origin/{branch}:{filepath}"], ct);
     }
 }
