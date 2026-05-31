@@ -1,13 +1,12 @@
 namespace Gitka.Api;
 
-public class GitFileSaver(Uri repositoryUrl, GitClient Git)
+public static class GitFileSaver
 {
-    public async Task PushFile(string branch, string filepath, string content, CancellationToken ct = default)
+    public static async Task PushFile(this GitClient client, Uri repositoryUrl, string branch, string filepath, string content, CancellationToken ct = default)
     {
-        // We create a new clone for each push to avoid race conditions in the local repository.
         var cloneDir = Path.Combine(Path.GetTempPath(), "gitka-put", Guid.NewGuid().ToString("N")[..8]);
 
-        Task<string> Run(params string[] args) => Git.Run(cloneDir, args, ct);
+        Task<string> Run(params string[] args) => client.Run(cloneDir, args, ct);
 
         Directory.CreateDirectory(cloneDir);
         try

@@ -6,6 +6,8 @@ public class GitClient
 {
     private readonly Command baseCommand;
 
+    public string CacheDir { get; } = Path.Combine(Path.GetTempPath(), "gitka", Guid.NewGuid().ToString("N")[..8]);
+
     private GitClient(Command baseCommand)
     {
         this.baseCommand = baseCommand;

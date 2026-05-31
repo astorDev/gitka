@@ -1,29 +1,24 @@
 namespace Gitka.Api;
 
-public class GitFilesCache(GitClient gitClient, Uri repositoryUrl)
+public static class GitFilesCache
 {
-    readonly string _cacheDir = Path.Combine(Path.GetTempPath(), "gitka", Guid.NewGuid().ToString("N")[..8]);
+    static Task<string> Git(GitClient client, string[] args, CancellationToken ct) =>
+        client.Run(client.CacheDir, args, ct);
 
-    private async Task<string> Git(string[] args, CancellationToken ct = default)
+    public static async Task EnsureCacheIsUpToDate(this GitClient client, Uri repositoryUrl, CancellationToken ct)
     {
-        return await gitClient.Run(_cacheDir, args, ct);
-    }
-
-    async Task EnsureCloned(CancellationToken ct = default)
-    {
-        if (Directory.Exists(Path.Combine(_cacheDir, ".git")))
+        if (Directory.Exists(Path.Combine(client.CacheDir, ".git")))
         {
-            await Git(["fetch", "--all"], ct);
+            await Git(client, ["fetch", "--all"], ct);
             return;
         }
 
-        Directory.CreateDirectory(_cacheDir);
-        await Git(["clone", repositoryUrl.ToString(), "."], ct);
+        Directory.CreateDirectory(client.CacheDir);
+        await Git(client, ["clone", repositoryUrl.ToString(), "."], ct);
     }
 
-    public async Task<string> GetFile(string branch, string filepath, CancellationToken ct = default)
+    public static async Task<string> GetFileFromCache(this GitClient client, string branch, string filepath, CancellationToken ct = default)
     {
-        await EnsureCloned(ct);
-        return await Git(["show", $"origin/{branch}:{filepath}"], ct);
+        return await Git(client, ["show", $"origin/{branch}:{filepath}"], ct);
     }
 }
