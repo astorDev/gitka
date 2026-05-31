@@ -1,0 +1,18 @@
+PUT /api-testing/example-play/state.json
+
+{
+    "state" : "PUT for the first time"
+}
+
+###
+GET /api-testing/example-play/state.json
+
+###
+PUT /api-testing/example-play/state.json
+
+{
+    "state" : "Updated with the second PUT"
+}
+
+###
+GET /api-testing/example-play/state.json
