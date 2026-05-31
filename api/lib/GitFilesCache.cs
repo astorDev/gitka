@@ -7,14 +7,22 @@ public static class GitFilesCache
 
     public static async Task EnsureCacheIsUpToDate(this GitClient client, Uri repositoryUrl, CancellationToken ct)
     {
-        if (Directory.Exists(Path.Combine(client.CacheDir, ".git")))
+        await client.CacheLock.WaitAsync(ct);
+        try
         {
-            await Git(client, ["fetch", "--all"], ct);
-            return;
-        }
+            if (Directory.Exists(Path.Combine(client.CacheDir, ".git")))
+            {
+                await Git(client, ["fetch", "--all"], ct);
+                return;
+            }
 
-        Directory.CreateDirectory(client.CacheDir);
-        await Git(client, ["clone", repositoryUrl.ToString(), "."], ct);
+            Directory.CreateDirectory(client.CacheDir);
+            await Git(client, ["clone", repositoryUrl.ToString(), "."], ct);
+        }
+        finally
+        {
+            client.CacheLock.Release();
+        }
     }
 
     public static async Task<string> GetFileFromCache(this GitClient client, string branch, string filepath, CancellationToken ct = default)

@@ -2,11 +2,13 @@ using CliWrap;
 
 namespace Gitka.Api;
 
-public class GitClient
+public class GitClient : IDisposable
 {
     private readonly Command baseCommand;
 
     public string CacheDir { get; } = Path.Combine(Path.GetTempPath(), "gitka", Guid.NewGuid().ToString("N")[..8]);
+
+    public SemaphoreSlim CacheLock { get; } = new(1, 1);
 
     private GitClient(Command baseCommand)
     {
@@ -35,4 +37,6 @@ public class GitClient
             return new GitClient(command);
         }
     }
+
+    public void Dispose() => CacheLock.Dispose();
 }
