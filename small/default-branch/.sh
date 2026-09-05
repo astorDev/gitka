@@ -1,0 +1,1 @@
+git symbolic-ref --short refs/remotes/origin/HEAD | sed 's@^origin/@@'
