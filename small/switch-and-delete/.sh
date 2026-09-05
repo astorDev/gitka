@@ -1,0 +1,1 @@
+branch=$(git branch --show-current) && git switch main && git branch -d "$branch"
