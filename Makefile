@@ -7,5 +7,5 @@ pr:
 	gh pr view --web
 
 post-pr:
-	sh ./small/switch-and-delete/.sh
+	git default-and-burn
 	git pull
